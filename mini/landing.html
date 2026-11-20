@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumo - 생각보다 빠른 AI 메모 앱</title>
+<style>
+  :root {
+    --ink: #1c1740;
+    --muted: #6a6585;
+    --cream: #fffaf2;
+    --indigo: #3a2a8c;
+    --mesh:
+      radial-gradient(circle at 0% 0%,   #4a1080 0%, transparent 55%),
+      radial-gradient(circle at 100% 0%, #2a9fe0 0%, transparent 55%),
+      radial-gradient(circle at 0% 50%,  #f5206a 0%, transparent 50%),
+      radial-gradient(circle at 100% 55%, #6ff0dc 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, #ffa84f 0%, transparent 55%),
+      radial-gradient(circle at 100% 100%, #f6f6d8 0%, transparent 55%),
+      #b07aa8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+
+  .btn {
+    display: inline-block;
+    background: #fff;
+    color: var(--indigo);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 40px;
+    border-radius: 999px;
+    box-shadow: 0 10px 30px rgba(40, 10, 90, .28);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(40, 10, 90, .36); }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 180px 0 160px;
+    text-align: center;
+    color: #fff;
+    background: var(--mesh);
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: rgba(24, 8, 70, .28);
+  }
+  .hero .wrap { position: relative; }
+  .brand {
+    display: inline-block;
+    font-size: 15px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    padding: 8px 20px;
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    backdrop-filter: blur(8px);
+    margin-bottom: 40px;
+  }
+  .hero h1 {
+    font-size: 76px; line-height: 1.12; font-weight: 800; letter-spacing: -0.04em;
+    text-shadow: 0 4px 30px rgba(30, 10, 80, .35);
+  }
+  .hero p {
+    margin: 32px auto 52px; max-width: 520px;
+    font-size: 21px; color: rgba(255,255,255,.92);
+  }
+
+  /* Features */
+  .features { padding: 140px 0; }
+  .features h2 {
+    text-align: center; font-size: 40px; font-weight: 800; letter-spacing: -0.03em;
+    margin-bottom: 72px;
+  }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 44px 34px;
+    box-shadow: 0 20px 50px rgba(74, 16, 128, .09);
+  }
+  .card .icon {
+    width: 64px; height: 64px;
+    display: grid; place-items: center;
+    border-radius: 20px;
+    font-size: 30px;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #ffd9a8, #ff9ec2 55%, #b9a6ff);
+  }
+  .card h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .card p { color: var(--muted); font-size: 16px; }
+
+  /* Bottom CTA */
+  .cta {
+    position: relative;
+    padding: 140px 0;
+    text-align: center;
+    color: #fff;
+    background: var(--mesh);
+  }
+  .cta::before { content: ""; position: absolute; inset: 0; background: rgba(24, 8, 70, .28); }
+  .cta .wrap { position: relative; }
+  .cta h2 {
+    font-size: 48px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2;
+    margin-bottom: 44px;
+    text-shadow: 0 4px 30px rgba(30, 10, 80, .35);
+  }
+
+  footer {
+    padding: 36px 0; text-align: center; font-size: 14px;
+    color: rgba(255,255,255,.75); background: #1c1740;
+  }
+
+  @media (max-width: 768px) {
+    .wrap { padding: 0 24px; }
+    .hero { padding: 110px 0 90px; }
+    .hero h1 { font-size: 44px; }
+    .hero p { font-size: 17px; }
+    .features { padding: 80px 0; }
+    .features h2 { font-size: 30px; margin-bottom: 44px; }
+    .cards { grid-template-columns: 1fr; }
+    .cta { padding: 90px 0; }
+    .cta h2 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">Lumo</div>
+    <h1>생각보다 빠른<br>AI 메모 앱</h1>
+    <p>떠오르는 순간 적고, 정리는 Lumo가 대신합니다. 기록에 쓰는 시간을 줄이고 생각에 집중하세요.</p>
+    <a class="btn" href="#">무료로 시작하기</a>
+  </div>
+</header>
+
+<main>
+  <section class="features">
+    <div class="wrap">
+      <h2>메모가 달라지는 세 가지</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="icon">⚡</div>
+          <h3>번개 같은 입력</h3>
+          <p>앱을 열면 바로 입력 상태. 로딩 없이 떠오른 생각을 놓치지 않고 담아요.</p>
+        </article>
+        <article class="card">
+          <div class="icon">✨</div>
+          <h3>AI 자동 정리</h3>
+          <p>흩어진 메모를 요약하고 태그를 붙여요. 정리는 Lumo에게 맡기세요.</p>
+        </article>
+        <article class="card">
+          <div class="icon">🔍</div>
+          <h3>말로 찾는 검색</h3>
+          <p>키워드가 아니어도 괜찮아요. 기억나는 대로 물어보면 메모를 찾아줘요.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>지금 첫 메모를 남겨보세요</h2>
+      <a class="btn" href="#">무료로 시작하기</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Lumo. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

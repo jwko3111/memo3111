@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메모리 게임</title>
+<style>
+  :root {
+    --ink: #1c1740;
+    --indigo: #3a2a8c;
+    --mesh:
+      radial-gradient(circle at 0% 0%,   #4a1080 0%, transparent 55%),
+      radial-gradient(circle at 100% 0%, #2a9fe0 0%, transparent 55%),
+      radial-gradient(circle at 0% 50%,  #f5206a 0%, transparent 50%),
+      radial-gradient(circle at 100% 55%, #6ff0dc 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, #ffa84f 0%, transparent 55%),
+      radial-gradient(circle at 100% 100%, #f6f6d8 0%, transparent 55%),
+      #b07aa8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: var(--mesh) fixed;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 32px 16px 48px;
+  }
+  h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; text-shadow: 0 4px 24px rgba(30,10,80,.35); }
+  .stats { display: flex; gap: 12px; margin: 20px 0 24px; }
+  .stat {
+    min-width: 110px; padding: 10px 20px; text-align: center;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45);
+    border-radius: 18px; backdrop-filter: blur(8px);
+  }
+  .stat span { display: block; font-size: 12px; letter-spacing: .1em; opacity: .85; }
+  .stat b { font-size: 26px; }
+
+  .board {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+    width: min(100%, 520px);
+  }
+  .card { aspect-ratio: 1; perspective: 700px; border: 0; background: none; cursor: pointer; }
+  .inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d; transition: transform .45s ease;
+  }
+  .card.open .inner { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    border-radius: 18px; backface-visibility: hidden;
+    box-shadow: 0 8px 20px rgba(40,10,90,.25);
+  }
+  .back {
+    background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.5);
+    backdrop-filter: blur(6px); font-size: 24px; color: rgba(255,255,255,.8);
+  }
+  .card:hover .back { background: rgba(255,255,255,.32); }
+  .front { background: #fff; transform: rotateY(180deg); font-size: clamp(26px, 8vw, 44px); }
+  .front svg { width: 84%; height: auto; border-radius: 4px; box-shadow: 0 0 0 1px rgba(28,23,64,.18); }
+  .card.matched .front { background: #fff7e0; outline: 3px solid #ffd36b; }
+
+  .btn {
+    margin-top: 28px; background: #fff; color: var(--indigo); border: 0; cursor: pointer;
+    font: inherit; font-size: 16px; font-weight: 700; padding: 14px 32px; border-radius: 999px;
+    box-shadow: 0 10px 30px rgba(40,10,90,.28); transition: transform .2s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+
+  .overlay {
+    position: fixed; inset: 0; display: none; place-items: center; text-align: center;
+    background: rgba(24,8,70,.6); backdrop-filter: blur(4px); z-index: 10;
+  }
+  .overlay.show { display: grid; }
+  .modal { background: #fff; color: var(--ink); padding: 44px 48px; border-radius: 28px; max-width: 90vw; }
+  .modal h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+  .modal p { font-size: 18px; color: #6a6585; }
+  .modal .btn { background: var(--indigo); color: #fff; }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 28px; }
+    .board { gap: 8px; }
+    .stat { min-width: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🧠 메모리 게임</h1>
+<div class="stats">
+  <div class="stat"><span>점수</span><b id="score">0</b></div>
+  <div class="stat"><span>시도</span><b id="tries">0</b></div>
+</div>
+
+<div class="board" id="board"></div>
+<button class="btn" id="restart">다시 하기</button>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>🎉 완료!</h2>
+    <p>최종 점수 <b id="finalScore">0</b>점 · 시도 <b id="finalTries">0</b>회</p>
+    <button class="btn" id="again">다시 하기</button>
+  </div>
+</div>
+
+<script>
+  // 국기는 30×20 SVG로 직접 그린다 (OS별 이모지 국기 미지원·외부 이미지 의존 방지)
+  const stripes = (vertical, colors) => colors.map((c, i) => {
+    const n = colors.length;
+    return vertical
+      ? '<rect x="' + (30 / n * i) + '" y="0" width="' + (30 / n + .1) + '" height="20" fill="' + c + '"/>'
+      : '<rect x="0" y="' + (20 / n * i) + '" width="30" height="' + (20 / n + .1) + '" fill="' + c + '"/>';
+  }).join('');
+
+  const FLAGS = {
+    '일본': '<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#bc002d"/>',
+    '프랑스': stripes(true, ['#0055a4', '#fff', '#ef4135']),
+    '독일': stripes(false, ['#000', '#dd0000', '#ffce00']),
+    '이탈리아': stripes(true, ['#009246', '#fff', '#ce2b37']),
+    '네덜란드': stripes(false, ['#ae1c28', '#fff', '#21468b']),
+    '폴란드': stripes(false, ['#fff', '#dc143c']),
+    '스웨덴': '<rect width="30" height="20" fill="#006aa7"/><rect x="9" width="4" height="20" fill="#fecc00"/><rect y="8" width="30" height="4" fill="#fecc00"/>',
+    '우크라이나': stripes(false, ['#0057b7', '#ffd700']),
+    '오스트리아': stripes(false, ['#ed2939', '#fff', '#ed2939']),
+    '헝가리': stripes(false, ['#ce2939', '#fff', '#477050']),
+    '아일랜드': stripes(true, ['#169b62', '#fff', '#ff883e']),
+    '벨기에': stripes(true, ['#000', '#fae042', '#ed2939'])
+  };
+  const NAMES = Object.keys(FLAGS);
+  const flagSvg = name => '<svg viewBox="0 0 30 20" role="img" aria-label="' + name + '">' + FLAGS[name] + '</svg>';
+
+  const JOKER = '🃏';
+  const PAIR_SCORE = 10, JOKER_SCORE = 5, TOTAL_PAIRS = NAMES.length;
+
+  const board = document.getElementById('board');
+  const scoreEl = document.getElementById('score');
+  const triesEl = document.getElementById('tries');
+  const overlay = document.getElementById('overlay');
+
+  let first, lock, score, tries, pairs, jokerFound;
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function render() {
+    scoreEl.textContent = score;
+    triesEl.textContent = tries;
+  }
+
+  function start() {
+    first = null; lock = false; score = 0; tries = 0; pairs = 0; jokerFound = false;
+    overlay.classList.remove('show');
+    board.innerHTML = '';
+    shuffle([...NAMES, ...NAMES, JOKER]).forEach(id => {
+      const card = document.createElement('button');
+      card.className = 'card';
+      card.type = 'button';
+      card.dataset.id = id;
+      card.setAttribute('aria-label', '카드');
+      const art = id === JOKER ? JOKER : flagSvg(id);
+      card.innerHTML = '<div class="inner"><div class="face back">?</div><div class="face front">' + art + '</div></div>';
+      card.addEventListener('click', () => flip(card));
+      board.appendChild(card);
+    });
+    render();
+  }
+
+  function finishIfDone() {
+    if (pairs === TOTAL_PAIRS && jokerFound) {
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('finalTries').textContent = tries;
+      setTimeout(() => overlay.classList.add('show'), 600);
+    }
+  }
+
+  function flip(card) {
+    if (lock || card.classList.contains('open')) return;
+    card.classList.add('open');
+
+    if (card.dataset.id === JOKER) {
+      card.classList.add('matched');
+      jokerFound = true;
+      score += JOKER_SCORE;
+      render();
+      finishIfDone();
+      return;
+    }
+
+    if (!first) { first = card; return; }
+
+    tries++;
+    const a = first, b = card;
+    first = null;
+    if (a.dataset.id === b.dataset.id) {
+      a.classList.add('matched'); b.classList.add('matched');
+      pairs++; score += PAIR_SCORE;
+      render();
+      finishIfDone();
+    } else {
+      lock = true;
+      render();
+      setTimeout(() => {
+        a.classList.remove('open'); b.classList.remove('open');
+        lock = false;
+      }, 800);
+    }
+  }
+
+  document.getElementById('restart').addEventListener('click', start);
+  document.getElementById('again').addEventListener('click', start);
+  start();
+</script>
+</body>
+</html>

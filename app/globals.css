@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/*
+  디자인 토큰 (CLAUDE.md 표와 같은 이름)
+  Figma 변수 이름의 "/"를 "-"로 바꿔 그대로 쓴다. 예) text/primary → --text-primary
+  코드에서는 이 이름만 쓴다: var(--text-primary), text-primary 처럼.
+*/
+@theme static {
+  /* 색 (Colors) */
+  --color-primary: #3182f6;
+  --surface-page: #f2f4f6;
+  --surface-card: #ffffff;
+  --text-primary: #191f28;
+  --text-secondary: #4e5968;
+  --text-muted: #8b95a1;
+  --text-on-primary: #ffffff;
+  --border-default: #e5e8eb;
+  --label-blue: #3182f6;
+  --label-blue-soft: #e8f3ff;
+  --label-green: #12a150;
+  --label-green-soft: #e3f8ec;
+  --label-orange: #f76808;
+  --label-orange-soft: #fff1e5;
+  --label-pink: #e5397a;
+  --label-pink-soft: #ffeaf1;
+
+  /* 간격 (Spacing) */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-34: 34px;
+  --space-48: 48px;
+  --space-64: 64px;
+
+  /* 모서리 (Spacing 컬렉션의 radius) */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* 글꼴 */
+  --font-sans: var(--font-noto-sans-kr), sans-serif;
+}
+
+/*
+  텍스트 스타일 (Figma 텍스트 스타일 이름의 "/"를 "-"로)
+  예) heading/xl → className="heading-xl"
+*/
+@utility heading-xl { font-size: 28px; line-height: 38px; font-weight: 700; letter-spacing: -0.8px; }
+@utility heading-lg { font-size: 26px; line-height: 36px; font-weight: 700; letter-spacing: -0.8px; }
+@utility title-lg { font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: -0.4px; }
+@utility title-md { font-size: 17px; line-height: 24px; font-weight: 700; letter-spacing: -0.3px; }
+@utility label-md { font-size: 15px; line-height: 22px; font-weight: 700; letter-spacing: -0.2px; }
+@utility body-md { font-size: 16px; line-height: 28px; font-weight: 400; letter-spacing: -0.2px; }
+@utility body-sm { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: -0.1px; }
+@utility caption-md { font-size: 15px; line-height: 22px; font-weight: 500; letter-spacing: -0.2px; }
+@utility caption-sm { font-size: 13px; line-height: 18px; font-weight: 500; letter-spacing: 0px; }
+@utility button-md { font-size: 17px; line-height: 24px; font-weight: 700; letter-spacing: -0.2px; }
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  word-break: keep-all;
+}
+
+/* 본문 편집기: 입력한 서식이 상세 화면과 같은 모양으로 보인다 (대제목·소제목·문단·목록·굵게) */
+.editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+/* 텍스트 스타일 title-lg / title-md / body-md 와 같은 값 */
+.editor-body h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-primary);
+}
+.editor-body h3 {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+.editor-body p,
+.editor-body div {
+  font-size: 16px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  color: var(--text-secondary);
+}
+.editor-body b,
+.editor-body strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.editor-body ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  list-style: none;
+}
+.editor-body li {
+  font-size: 16px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: var(--space-8);
+}
+.editor-body li::before {
+  content: "•";
+}
+
+/* 아이콘 색은 글자색을 따른다 */
+svg {
+  color: inherit;
+}
